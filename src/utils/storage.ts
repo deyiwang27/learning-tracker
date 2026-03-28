@@ -49,3 +49,12 @@ export function saveProgress(progress: ProgressMap): void {
 
   window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
 }
+
+export function resetStoredTracker(): void {
+  if (!isBrowserAvailable()) {
+    return;
+  }
+
+  window.localStorage.removeItem(START_DATE_KEY);
+  window.localStorage.removeItem(PROGRESS_KEY);
+}

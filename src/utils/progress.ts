@@ -1,11 +1,11 @@
 import type { MetricsSummary, ProgressMap, Task } from '../types';
 
-export function getReleasedTasks(tasks: Task[], currentDay: number): Task[] {
-  return tasks.filter((task) => task.day <= currentDay);
+export function getReleasedTasks(tasks: Task[], todayKey: string): Task[] {
+  return tasks.filter((task) => task.date <= todayKey);
 }
 
-export function getTodayTasks(tasks: Task[], currentDay: number): Task[] {
-  return tasks.filter((task) => task.day === currentDay);
+export function getTodayTasks(tasks: Task[], todayKey: string): Task[] {
+  return tasks.filter((task) => task.date === todayKey);
 }
 
 export function isTaskCompleted(progress: ProgressMap, taskId: string): boolean {
@@ -32,9 +32,9 @@ function getCompletedCount(tasks: Task[], progress: ProgressMap): number {
   return tasks.filter((task) => isTaskCompleted(progress, task.id)).length;
 }
 
-export function getMetrics(tasks: Task[], currentDay: number, progress: ProgressMap): MetricsSummary {
-  const releasedTasks = getReleasedTasks(tasks, currentDay);
-  const todayTasks = getTodayTasks(tasks, currentDay);
+export function getMetrics(tasks: Task[], todayKey: string, progress: ProgressMap): MetricsSummary {
+  const releasedTasks = getReleasedTasks(tasks, todayKey);
+  const todayTasks = getTodayTasks(tasks, todayKey);
 
   return {
     daily: {

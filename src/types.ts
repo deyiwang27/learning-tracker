@@ -1,13 +1,13 @@
-export const CATEGORY_ORDER = ['speaking', 'listening', 'interview', 'coding'] as const;
-
-export type Category = (typeof CATEGORY_ORDER)[number];
+export type TaskCategory = 'speaking' | 'listening' | 'interview' | 'coding';
 
 export interface Task {
   id: string;
   title: string;
   content: string;
-  category: Category;
+  category: TaskCategory;
+  week: number;
   day: number;
+  date: string;
 }
 
 export interface ProgressEntry {

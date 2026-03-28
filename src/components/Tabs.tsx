@@ -1,29 +1,27 @@
-import type { Category } from '../types';
+type TabValue = number | string;
 
-interface TabsProps {
-  categories: readonly Category[];
-  activeCategory: Category;
-  onChange: (category: Category) => void;
+export interface TabOption<T extends TabValue> {
+  label: string;
+  value: T;
 }
 
-const CATEGORY_LABELS: Record<Category, string> = {
-  speaking: 'Speaking',
-  listening: 'Listening',
-  interview: 'Interview',
-  coding: 'Coding',
-};
+interface TabsProps<T extends TabValue> {
+  items: readonly TabOption<T>[];
+  activeValue: T;
+  onChange: (value: T) => void;
+}
 
-export function Tabs({ categories, activeCategory, onChange }: TabsProps) {
+export function Tabs<T extends TabValue>({ items, activeValue, onChange }: TabsProps<T>) {
   return (
     <div className="flex flex-wrap gap-3">
-      {categories.map((category) => {
-        const isActive = category === activeCategory;
+      {items.map((item) => {
+        const isActive = item.value === activeValue;
 
         return (
           <button
-            key={category}
+            key={String(item.value)}
             type="button"
-            onClick={() => onChange(category)}
+            onClick={() => onChange(item.value)}
             className={[
               'rounded-full px-4 py-2 text-sm font-semibold transition',
               isActive
@@ -31,7 +29,7 @@ export function Tabs({ categories, activeCategory, onChange }: TabsProps) {
                 : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 hover:text-slate-900',
             ].join(' ')}
           >
-            {CATEGORY_LABELS[category]}
+            {item.label}
           </button>
         );
       })}
