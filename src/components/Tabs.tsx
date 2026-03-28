@@ -25,7 +25,7 @@ export function Tabs<T extends TabValue>({ items, activeValue, onChange }: TabsP
             className={[
               'rounded-full px-4 py-2 text-sm font-semibold transition',
               isActive
-                ? 'bg-slate-950 text-white shadow-[0_10px_30px_-15px_rgba(15,23,42,0.8)]'
+                ? 'bg-amber-300 text-slate-950 shadow-[0_10px_30px_-15px_rgba(217,119,6,0.55)]'
                 : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 hover:text-slate-900',
             ].join(' ')}
           >

@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import tasksData from './data/tasks.json';
+import { DoveLogo } from './components/DoveLogo';
 import { Metrics } from './components/Metrics';
 import { ProgressGrid } from './components/ProgressGrid';
+import { TaskDetailPage } from './components/TaskDetailPage';
 import { Tabs, type TabOption } from './components/Tabs';
 import { TaskList } from './components/TaskList';
 import type { ProgressMap, Task } from './types';
@@ -19,6 +21,11 @@ import { getStoredProgress, saveProgress } from './utils/storage';
 
 const tasks = tasksData as Task[];
 const TEST_TODAY_KEY = PLAN_START_DATE;
+const PENDING_SCROLL_TASK_KEY = 'pending_scroll_task_id';
+
+type AppRoute =
+  | { page: 'home' }
+  | { page: 'task'; taskId: string };
 
 const WEEK_OPTIONS: TabOption<number>[] = Array.from({ length: PLAN_WEEK_COUNT }, (_, index) => ({
   label: `Week ${index + 1}`,
@@ -67,8 +74,20 @@ function getStatusText(todayKey: string, todayTask: Task | null): string {
   return 'No study day is scheduled today. Progress resumes on the next plan day.';
 }
 
+function getRouteFromHash(hash: string): AppRoute {
+  if (hash.startsWith('#/task/')) {
+    return {
+      page: 'task',
+      taskId: decodeURIComponent(hash.replace('#/task/', '')),
+    };
+  }
+
+  return { page: 'home' };
+}
+
 export default function App() {
   const [progress, setProgress] = useState<ProgressMap>(() => getStoredProgress());
+  const [route, setRoute] = useState<AppRoute>(() => getRouteFromHash(window.location.hash));
   const initialSelection = getInitialSelection(TEST_TODAY_KEY);
   const [selectedWeek, setSelectedWeek] = useState<number>(initialSelection.week);
   const [selectedDay, setSelectedDay] = useState<number>(initialSelection.day);
@@ -99,35 +118,89 @@ export default function App() {
     saveProgress(nextProgress);
   };
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      setRoute(getRouteFromHash(window.location.hash));
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (route.page !== 'home') {
+      return;
+    }
+
+    const pendingTaskId = window.sessionStorage.getItem(PENDING_SCROLL_TASK_KEY);
+
+    if (!pendingTaskId) {
+      return;
+    }
+
+    window.sessionStorage.removeItem(PENDING_SCROLL_TASK_KEY);
+
+    window.requestAnimationFrame(() => {
+      document.getElementById(`task-card-${pendingTaskId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    });
+  }, [route.page, selectedWeek, selectedDay]);
+
+  if (route.page === 'task') {
+    const task = tasks.find((item) => item.id === route.taskId) ?? null;
+
+    return (
+      <TaskDetailPage
+        task={task}
+        progress={progress}
+        onToggle={handleToggleTask}
+        onBack={(taskId) => {
+          if (taskId) {
+            window.sessionStorage.setItem(PENDING_SCROLL_TASK_KEY, taskId);
+          }
+
+          window.location.hash = '';
+        }}
+      />
+    );
+  }
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <section className="rounded-[2rem] border border-white/60 bg-white/80 p-6 shadow-[0_24px_90px_-45px_rgba(15,23,42,0.75)] backdrop-blur xl:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-700">
-              Learning Tracker
-            </p>
+            <div className="flex items-center gap-4">
+              <DoveLogo />
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-700">
+                Learning Tracker
+              </p>
+            </div>
             <h1 className="mt-4 font-serif text-4xl text-slate-900 sm:text-5xl">
-              Your Weekly Learning Roadmap
+              Nange's Weekly Learning Roadmap
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
               This plan covers 25 study days in 5 weeks through {formatPlanDate(PLAN_START_DATE)} to {formatPlanDate(PLAN_END_DATE)}.
             </p>
           </div>
 
-          <div className="rounded-[1.5rem] bg-slate-950 px-5 py-4 text-sm text-slate-200">
-            <p className="uppercase tracking-[0.18em] text-slate-400">Today</p>
+          <div className="rounded-[1.5rem] bg-amber-300 px-5 py-4 text-sm text-slate-900 shadow-[0_20px_60px_-35px_rgba(217,119,6,0.55)]">
+            <p className="uppercase tracking-[0.18em] text-amber-900/70">Today</p>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <p className="text-2xl font-semibold text-white">{formatLongDate(todayKey)}</p>
-              <span className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-300">
+              <p className="text-2xl font-semibold text-slate-950">{formatLongDate(todayKey)}</p>
+              <span className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-950/70">
                 {formatWeekday(todayKey)}
               </span>
             </div>
             <div className="mt-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.14em]">
-              <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">
+              <span className="rounded-full border border-amber-900/20 bg-white/50 px-3 py-2 text-slate-900">
                 Week {headerWeek}
               </span>
-              <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">
+              <span className="rounded-full border border-amber-900/20 bg-white/50 px-3 py-2 text-slate-900">
                 Day {headerDay}
               </span>
             </div>

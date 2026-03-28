@@ -3,7 +3,8 @@ export type TaskCategory = 'speaking' | 'listening' | 'interview' | 'coding';
 export interface Task {
   id: string;
   title: string;
-  content: string;
+  description: string;
+  detail: string;
   category: TaskCategory;
   week: number;
   day: number;
