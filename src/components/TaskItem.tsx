@@ -4,7 +4,6 @@ import { formatPlanDate } from '../utils/date';
 
 interface TaskItemProps {
   task: Task;
-  taskNumber: number;
   completed: boolean;
   onToggle: (taskId: string) => void;
 }
@@ -16,7 +15,7 @@ const CATEGORY_STYLES: Record<TaskCategory, string> = {
   coding: 'bg-violet-100 text-violet-800',
 };
 
-export function TaskItem({ task, taskNumber, completed, onToggle }: TaskItemProps) {
+export function TaskItem({ task, completed, onToggle }: TaskItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -34,7 +33,7 @@ export function TaskItem({ task, taskNumber, completed, onToggle }: TaskItemProp
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Week {task.week} · Day {task.day} · Task #{taskNumber}
+              Week {task.week} · Day {task.day} · Task #{task.taskNumber}
             </p>
             <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-800">
               {formatPlanDate(task.date)}

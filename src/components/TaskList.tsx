@@ -11,6 +11,8 @@ interface TaskListProps {
 }
 
 export function TaskList({ tasks, isReleased, progress, onToggle }: TaskListProps) {
+  const sortedTasks = [...tasks].sort((left, right) => left.taskNumber - right.taskNumber);
+
   if (tasks.length === 0) {
     return (
       <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white/60 p-6 text-sm text-slate-500">
@@ -19,7 +21,7 @@ export function TaskList({ tasks, isReleased, progress, onToggle }: TaskListProp
     );
   }
 
-  const [firstTask] = tasks;
+  const [firstTask] = sortedTasks;
 
   if (!isReleased) {
     return (
@@ -31,11 +33,10 @@ export function TaskList({ tasks, isReleased, progress, onToggle }: TaskListProp
 
   return (
     <div className="space-y-4">
-      {tasks.map((task, index) => (
+      {sortedTasks.map((task) => (
         <TaskItem
           key={task.id}
           task={task}
-          taskNumber={index + 1}
           completed={isTaskCompleted(progress, task.id)}
           onToggle={onToggle}
         />

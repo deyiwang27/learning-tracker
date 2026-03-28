@@ -2,6 +2,7 @@ export type TaskCategory = 'speaking' | 'listening' | 'interview' | 'coding';
 
 export interface Task {
   id: string;
+  taskNumber: number;
   title: string;
   description: string;
   detail: string;

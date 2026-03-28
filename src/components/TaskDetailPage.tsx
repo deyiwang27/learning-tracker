@@ -52,7 +52,7 @@ export function TaskDetailPage({ task, progress, onBack, onToggle }: TaskDetailP
         <div className="mt-8 flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Week {task.week} · Day {task.day}
+              Week {task.week} · Day {task.day} · Task #{task.taskNumber}
             </p>
             <h1 className="font-serif text-4xl text-slate-900">{task.title}</h1>
             <div className="flex flex-wrap items-center gap-3">

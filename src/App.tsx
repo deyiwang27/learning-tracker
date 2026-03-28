@@ -20,7 +20,7 @@ import { getMetrics, getReleasedTasks, getTodayTasks, toggleTaskCompletion } fro
 import { getStoredProgress, saveProgress } from './utils/storage';
 
 const tasks = tasksData as Task[];
-const TEST_TODAY_KEY = PLAN_START_DATE;
+const TEST_TODAY_KEY = '2026-04-10';
 const PENDING_SCROLL_TASK_KEY = 'pending_scroll_task_id';
 
 type AppRoute =
@@ -105,12 +105,12 @@ export default function App() {
     ? 0
     : todayKey > PLAN_END_DATE
       ? PLAN_WEEK_COUNT
-      : selectedWeek;
+      : (todayTask?.week ?? 0);
   const headerDay = todayKey < PLAN_START_DATE
     ? 0
     : todayKey > PLAN_END_DATE
       ? PLAN_DAYS_PER_WEEK
-      : selectedDay;
+      : (todayTask?.day ?? 0);
 
   const handleToggleTask = (taskId: string) => {
     const nextProgress = toggleTaskCompletion(progress, taskId);

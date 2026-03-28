@@ -13,7 +13,7 @@ export function ProgressGrid({ tasks, progress }: ProgressGridProps) {
         Completion Progress
       </p>
 
-      <div className="mt-6 inline-grid grid-cols-5 gap-px bg-slate-200 p-px">
+      <div className="mt-6 inline-grid grid-cols-8 gap-px bg-slate-200 p-px">
         {tasks.map((task) => {
           const completed = isTaskCompleted(progress, task.id);
 
