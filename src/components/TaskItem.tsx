@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import type { Task, TaskCategory } from '../types';
+import type { Task } from '../types';
+import { CATEGORY_META } from '../utils/categories';
 import { formatPlanDate } from '../utils/date';
 
 interface TaskItemProps {
@@ -8,15 +9,9 @@ interface TaskItemProps {
   onToggle: (taskId: string) => void;
 }
 
-const CATEGORY_STYLES: Record<TaskCategory, string> = {
-  speaking: 'bg-amber-100 text-amber-800',
-  listening: 'bg-sky-100 text-sky-800',
-  interview: 'bg-emerald-100 text-emerald-800',
-  coding: 'bg-violet-100 text-violet-800',
-};
-
 export function TaskItem({ task, completed, onToggle }: TaskItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const categoryMeta = CATEGORY_META[task.category];
 
   return (
     <div
@@ -39,8 +34,8 @@ export function TaskItem({ task, completed, onToggle }: TaskItemProps) {
               {formatPlanDate(task.date)}
             </span>
           </div>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${CATEGORY_STYLES[task.category]}`}>
-            {task.category}
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${categoryMeta.badgeClassName}`}>
+            {categoryMeta.label}
           </span>
         </div>
         <a

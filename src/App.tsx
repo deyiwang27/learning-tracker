@@ -8,8 +8,12 @@ import { Tabs, type TabOption } from './components/Tabs';
 import { TaskList } from './components/TaskList';
 import type { ProgressMap, Task } from './types';
 import {
+  getTodayDateKey,
   PLAN_DAYS_PER_WEEK,
   PLAN_END_DATE,
+  PLAN_LAST_DAY,
+  PLAN_LENGTH_DAYS,
+  PLAN_LAST_WEEK,
   PLAN_START_DATE,
   PLAN_WEEK_COUNT,
   formatLongDate,
@@ -17,10 +21,9 @@ import {
   formatWeekday,
 } from './utils/date';
 import { getMetrics, getReleasedTasks, getTodayTasks, toggleTaskCompletion } from './utils/progress';
-import { getStoredProgress, saveProgress } from './utils/storage';
+import { getStoredProgress, resetStoredTracker, saveProgress } from './utils/storage';
 
 const tasks = tasksData as Task[];
-const TEST_TODAY_KEY = '2026-04-10';
 const PENDING_SCROLL_TASK_KEY = 'pending_scroll_task_id';
 
 type AppRoute =
@@ -43,7 +46,7 @@ function getInitialSelection(todayKey: string): { week: number; day: number } {
   }
 
   if (todayKey > PLAN_END_DATE) {
-    return { week: PLAN_WEEK_COUNT, day: PLAN_DAYS_PER_WEEK };
+    return { week: PLAN_LAST_WEEK, day: PLAN_LAST_DAY };
   }
 
   const todayTask = getTodayTasks(tasks, todayKey)[0];
@@ -86,13 +89,13 @@ function getRouteFromHash(hash: string): AppRoute {
 }
 
 export default function App() {
+  const todayKey = getTodayDateKey();
   const [progress, setProgress] = useState<ProgressMap>(() => getStoredProgress());
   const [route, setRoute] = useState<AppRoute>(() => getRouteFromHash(window.location.hash));
-  const initialSelection = getInitialSelection(TEST_TODAY_KEY);
+  const initialSelection = getInitialSelection(todayKey);
   const [selectedWeek, setSelectedWeek] = useState<number>(initialSelection.week);
   const [selectedDay, setSelectedDay] = useState<number>(initialSelection.day);
 
-  const todayKey = TEST_TODAY_KEY;
   const todayTask = getTodayTasks(tasks, todayKey)[0] ?? null;
   const releasedTasks = getReleasedTasks(tasks, todayKey);
   const releasedDayCount = new Set(releasedTasks.map((task) => task.date)).size;
@@ -104,18 +107,28 @@ export default function App() {
   const headerWeek = todayKey < PLAN_START_DATE
     ? 0
     : todayKey > PLAN_END_DATE
-      ? PLAN_WEEK_COUNT
+      ? PLAN_LAST_WEEK
       : (todayTask?.week ?? 0);
   const headerDay = todayKey < PLAN_START_DATE
     ? 0
     : todayKey > PLAN_END_DATE
-      ? PLAN_DAYS_PER_WEEK
+      ? PLAN_LAST_DAY
       : (todayTask?.day ?? 0);
 
   const handleToggleTask = (taskId: string) => {
     const nextProgress = toggleTaskCompletion(progress, taskId);
     setProgress(nextProgress);
     saveProgress(nextProgress);
+  };
+
+  const handleResetProgress = () => {
+    if (!window.confirm('Reset all saved progress and start over?')) {
+      return;
+    }
+
+    resetStoredTracker();
+    window.sessionStorage.removeItem(PENDING_SCROLL_TASK_KEY);
+    setProgress({});
   };
 
   useEffect(() => {
@@ -184,7 +197,7 @@ export default function App() {
               Nange's Weekly Learning Roadmap
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
-              This plan covers 25 study days in 5 weeks through {formatPlanDate(PLAN_START_DATE)} to {formatPlanDate(PLAN_END_DATE)}.
+              This plan covers {PLAN_LENGTH_DAYS} study days in 5 weeks through {formatPlanDate(PLAN_START_DATE)} to {formatPlanDate(PLAN_END_DATE)}.
             </p>
           </div>
 
@@ -203,6 +216,13 @@ export default function App() {
               <span className="rounded-full border border-amber-900/20 bg-white/50 px-3 py-2 text-slate-900">
                 Day {headerDay}
               </span>
+              <button
+                type="button"
+                onClick={handleResetProgress}
+                className="rounded-full border border-amber-900/20 bg-white/50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-900 transition hover:bg-white/70"
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
