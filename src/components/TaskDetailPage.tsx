@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { ProgressMap, Task } from '../types';
 import { CATEGORY_META } from '../utils/categories';
 import { formatPlanDate } from '../utils/date';
@@ -7,6 +8,84 @@ interface TaskDetailPageProps {
   progress: ProgressMap;
   onBack: (taskId?: string) => void;
   onToggle: (taskId: string) => void;
+}
+
+function renderDetailText(detail: string) {
+  const urlPattern = /(https?:\/\/[^\s]+)/g;
+  const renderLineWithLinks = (line: string) => {
+    const nodes: ReactNode[] = [];
+    let lastIndex = 0;
+
+    for (const match of line.matchAll(urlPattern)) {
+      const url = match[0];
+      const matchIndex = match.index ?? 0;
+
+      if (matchIndex > lastIndex) {
+        nodes.push(line.slice(lastIndex, matchIndex));
+      }
+
+      nodes.push(
+        <a
+          key={`${url}-${matchIndex}`}
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="text-sky-700 underline underline-offset-4"
+        >
+          {url}
+        </a>,
+      );
+
+      lastIndex = matchIndex + url.length;
+    }
+
+    if (lastIndex < line.length) {
+      nodes.push(line.slice(lastIndex));
+    }
+
+    return nodes;
+  };
+
+  return detail.split('\n').map((line, index) => {
+    const trimmedLine = line.trim();
+
+    if (trimmedLine === '') {
+      return <div key={index} className="h-2" />;
+    }
+
+    if (trimmedLine.endsWith(':') && !trimmedLine.includes('http')) {
+      return (
+        <p key={index} className="pt-1 text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
+          {trimmedLine}
+        </p>
+      );
+    }
+
+    if (trimmedLine.startsWith('Estimated duration:')) {
+      return (
+        <p key={index} className="font-semibold text-slate-900">
+          {trimmedLine}
+        </p>
+      );
+    }
+
+    if (trimmedLine.startsWith('- ')) {
+      const content = trimmedLine.slice(2);
+
+      return (
+        <div key={index} className="flex gap-3 pl-1">
+          <span className="pt-1 text-slate-400">•</span>
+          <p className="min-w-0 break-words">{renderLineWithLinks(content)}</p>
+        </div>
+      );
+    }
+
+    return (
+      <p key={index} className="break-words">
+        {renderLineWithLinks(line)}
+      </p>
+    );
+  });
 }
 
 export function TaskDetailPage({ task, progress, onBack, onToggle }: TaskDetailPageProps) {
@@ -82,7 +161,9 @@ export function TaskDetailPage({ task, progress, onBack, onToggle }: TaskDetailP
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
             Task Detail
           </p>
-          <p className="mt-4 text-base leading-8 text-slate-700">{task.detail}</p>
+          <div className="mt-4 space-y-2 text-base leading-8 text-slate-700">
+            {renderDetailText(task.detail)}
+          </div>
         </section>
       </div>
     </main>
