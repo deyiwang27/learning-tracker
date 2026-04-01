@@ -10,7 +10,7 @@ export function Onboarding({ onStart }: OnboardingProps) {
           30-day system
         </p>
         <h1 className="mt-4 font-serif text-4xl text-slate-900 sm:text-5xl">
-          Build daily momentum across speaking, listening, interview prep, and coding.
+          Build daily momentum across workout, listening, speaking, interview, immigration, and coding.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
           Start your plan when you are ready. From that date, the tracker unlocks tasks

@@ -1,4 +1,10 @@
-export type TaskCategory = 'speaking' | 'listening' | 'interview' | 'coding';
+export type TaskCategory =
+  | 'workout'
+  | 'listening'
+  | 'speaking'
+  | 'interview'
+  | 'immigration'
+  | 'coding';
 
 export interface Task {
   id: string;

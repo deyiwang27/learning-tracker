@@ -1,8 +1,10 @@
-export const PLAN_START_DATE = '2026-03-30';
-export const PLAN_END_DATE = '2026-05-01';
+export const PLAN_START_DATE = '2026-04-01';
+export const PLAN_END_DATE = '2026-04-30';
 export const PLAN_WEEK_COUNT = 5;
 export const PLAN_DAYS_PER_WEEK = 5;
-export const PLAN_LENGTH_DAYS = PLAN_WEEK_COUNT * PLAN_DAYS_PER_WEEK;
+export const PLAN_LAST_WEEK = 5;
+export const PLAN_LAST_DAY = 4;
+export const PLAN_LENGTH_DAYS = 24;
 
 function padDatePart(value: number): string {
   return value.toString().padStart(2, '0');
